@@ -3,7 +3,7 @@
 import os, json
 import numpy as np
 from keras.callbacks import ModelCheckpoint
-from keras.layers import Dense, Embedding, LSTM, Bidirectional, TimeDistributed, Activation
+from keras.layers import Dense, Embedding, LSTM, Bidirectional, TimeDistributed, Activation, Dropout
 from keras.models import load_model, Sequential
 from keras.utils import to_categorical
 from keras.preprocessing.sequence import pad_sequences
@@ -96,9 +96,10 @@ class LSTMNetwork(object):
                                  input_length=tokenizer.max_sequence_length,
                                  trainable=False,
                                  mask_zero=True))
+        self.model.Dropout(dropout_fraction)
         self.model.add(Bidirectional(LSTM(hidden_dim, return_sequences=True)))
-        self.model.add(TimeDistributed(Dense(hidden_dim)))
-        self.model.add(Activation('relu'))
+        #self.model.add(TimeDistributed(Dense(hidden_dim)))
+        #self.model.add(Activation('relu'))
         self.model.add(TimeDistributed(Dense(len(self.tag_map) + 1)))
         self.model.add(Activation('softmax'))
 

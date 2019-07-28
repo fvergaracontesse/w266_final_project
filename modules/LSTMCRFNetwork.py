@@ -137,8 +137,6 @@ class LSTMCRFNetwork(object):
         x_val = data[-nb_validation_samples:]
         y_val = labels[-nb_validation_samples:]
 
-        print(data.shape, labels.shape)
-
         # Train!
         self.save()
         checkpointer = ModelCheckpoint(filepath=self.prefix+'.h5', verbose=1, save_best_only=False)
@@ -150,8 +148,8 @@ class LSTMCRFNetwork(object):
     def evaluate(self, x_test, y_test, batch_size=256):
 
         print('Evaluating...')
-        predictions_last_epoch = self.model.predict(x_test, batch_size=batch_size, verbose=1)
-        predicted_classes = np.argmax(predictions_last_epoch, axis=2).flatten()
+        predictions = self.model.predict(x_test, batch_size=batch_size, verbose=1)
+        predicted_classes = np.argmax(predictions, axis=2).flatten()
         y_val = np.argmax(y_test, axis=2).flatten()
         target_names = ['']*(max(self.tag_map.values())+1)
         for category in self.tag_map:
