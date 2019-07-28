@@ -21,7 +21,6 @@ class LSTMNetwork(object):
             self.tag_map = {}
 
     def load(self, prefix=None):
-
         if prefix != None: self.prefix = prefix
         self.model = load_model(self.prefix+'.h5')
         self.tag_map = json.load(open(self.prefix+'.json', 'r'))
@@ -57,20 +56,20 @@ class LSTMNetwork(object):
             indices.append(self.tag_map[tag])
         return indices
 
-    def get_labels(self, tag_sets):
+    def get_labels(self, tag_sets, tokenizer):
         labels = []
         print('Getting labels...')
         for tag_set in tag_sets:
             indexed_tags = self.index_tags(tag_set)
             labels.append(to_categorical(np.asarray(indexed_tags), num_classes=4))
-        labels = pad_sequences(labels, maxlen=200)
+        labels = pad_sequences(labels, maxlen=tokenizer.max_sequence_length)
         return labels
 
-    def compile(self, tokenizer, glove_dir='./data/', embedding_dim=300, dropout_fraction=0.2, hidden_dim=32):
+    def compile(self, tokenizer, data_dir='./data/', embedding_dim=300, dropout_fraction=0.2, hidden_dim=32, embedding_file='glove-sbwc.i25.vec'):
         # Load embedding layer
-        print('Loading GloVe embedding...')
+        print('Loading spanish embedding...')
         embeddings_index = {}
-        f = open(os.path.join(glove_dir, 'glove-sbwc.i25.vec'), 'r')
+        f = open(os.path.join(data_dir, embedding_file), 'r')
         for line in f:
             values = line.split()
             word = values[0]
@@ -110,15 +109,6 @@ class LSTMNetwork(object):
                            metrics=['acc'])
 
     def train(self, data, labels, validation_split=0.2, batch_size=256, epochs=3):
-        """Train ner
-
-        Args:
-            data (np.array): 3D numpy array (n_samples, embedding_dim, tokenizer.max_sequence_length)
-            labels (np.array): 3D numpy array (n_samples, tokenizer.max_sequence_length, len(self.tag_map))
-            validation_split (float): Fraction of samples to be used for validation
-            batch_size (int): Training batch size
-            epochs (int): Number of training epochs
-        """
         print('Training...')
         # Split the data into a training set and a validation set
         np.random.seed(seed=1)
@@ -144,13 +134,6 @@ class LSTMNetwork(object):
         self.evaluate(x_val, y_val, batch_size)
 
     def evaluate(self, x_test, y_test, batch_size=256):
-        """Evaluate classifier
-
-        Args:
-            x_test (np.array): 2D numpy array (n_samples, tokenizer.max_sequence_length)
-            y_test (np.array): 3D numpy array (n_samples, tokenizer.max_sequence_length, len(self.tag_map))
-            batch_size (int): Training batch size
-        """
         print('Evaluating...')
         predictions_last_epoch = self.model.predict(x_test, batch_size=batch_size, verbose=1)
         predicted_classes = np.argmax(predictions_last_epoch, axis=2).flatten()

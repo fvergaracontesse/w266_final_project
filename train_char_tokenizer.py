@@ -23,9 +23,13 @@ def main(argv):
         print(('Processed %s texts.' % len(texts)))
 
         # Tokenize texts
-        tokenizer = CharTokenizer()
-        tokenizer.train(texts)
+        #set params:
+        max_sequence_length                 =sys.argv[2]
+        prefix                              =sys.argv[3]
+        max_sequence_sentence_words         =sys.argv[4]
+
+        charTokenizer = CharTokenizer(max_sequence_length,prefix,max_sequence_sentence_words)
+        charTokenizer.train(texts)
 
 if __name__ == "__main__":
     main(sys.argv)
-

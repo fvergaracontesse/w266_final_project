@@ -1,8 +1,5 @@
-"""Script to train a word tokenizer
-"""
-
 import sys, csv
-from modules.tokenizer import WordTokenizer
+from modules.wordTokenizer import WordTokenizer
 
 MAX_TEXTS = 1000000
 
@@ -23,9 +20,12 @@ def main(argv):
         print(('Processed %s texts.' % len(texts)))
 
         # Tokenize texts
+        max_sequence_length                 =sys.argv[2]
+        prefix                              =sys.argv[3]
+
+        tokenizer = CharTokenizer(max_sequence_length,prefix)
         tokenizer = WordTokenizer()
         tokenizer.train(texts)
 
 if __name__ == "__main__":
     main(sys.argv)
-

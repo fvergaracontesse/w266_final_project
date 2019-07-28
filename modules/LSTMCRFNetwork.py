@@ -64,28 +64,21 @@ class LSTMCRFNetwork(object):
             indices.append(self.tag_map[tag])
         return indices
 
-    def get_labels(self, tag_sets):
-        """Create labels from a list of tag_sets
-
-        Args:
-            tag_sets (list(list(str))): A list of word tag sets
-        Returns:
-            (list(list(int))): List of list of indices
-        """
+    def get_labels(self, tag_sets, tokenizer):
         labels = []
         print('Getting labels...')
         for tag_set in tag_sets:
             indexed_tags = self.index_tags(tag_set)
             labels.append(to_categorical(np.asarray(indexed_tags), num_classes=4))
-        labels = pad_sequences(labels, maxlen=200)
+        labels = pad_sequences(labels, maxlen=tokenizer.max_sequence_length)
         return labels
 
-    def compile(self, tokenizer, glove_dir='./data/', embedding_dim=300, dropout_fraction=0.2, hidden_dim=32):
+    def compile(self, tokenizer, glove_dir='./data/', embedding_dim=300, dropout_fraction=0.2, hidden_dim=32, embedding_file='glove-sbwc.i25.vec'):
 
         # Load embedding layer
-        print('Loading GloVe embedding...')
+        print('Loading spanish embedding...')
         embeddings_index = {}
-        f = open(os.path.join(glove_dir, 'glove-sbwc.i25.vec'), 'r')
+        f = open(os.path.join(glove_dir, embedding_file), 'r')
         for line in f:
             values = line.split()
             word = values[0]
