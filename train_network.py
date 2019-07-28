@@ -31,12 +31,12 @@ def main(argv):
     print(('Processed %s texts.' % len(texts)))
 
     # Tokenize texts
-    max_sequence_length_word                 =sys.argv[3]
-    max_sequence_length_char                 =sys.argv[4]
+    max_sequence_length_word                 =int(sys.argv[3])
+    max_sequence_length_char                 =int(sys.argv[4])
     prefix_word                              =sys.argv[5]
     prefix_char                              =sys.argv[6]
 
-    tokenizer = WordTokenizer(max_sequence_length_word,prefix_word)
+    wordTokenizer = WordTokenizer(max_sequence_length_word,prefix_word)
     wordTokenizer.load()
     data = wordTokenizer.tokenize(texts)
 
