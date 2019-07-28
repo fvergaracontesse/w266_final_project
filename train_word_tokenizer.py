@@ -23,9 +23,8 @@ def main(argv):
         max_sequence_length                 =sys.argv[2]
         prefix                              =sys.argv[3]
 
-        tokenizer = WordTokenizer(max_sequence_length,prefix)
-        tokenizer = WordTokenizer()
-        tokenizer.train(texts)
+        wordTokenizer = WordTokenizer(max_sequence_length,prefix)
+        wordTokenizer.train(texts)
 
 if __name__ == "__main__":
     main(sys.argv)
