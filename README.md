@@ -29,7 +29,7 @@ python splitTrainTestProductFile.py
 ```
 4. Run tokenization for words and chars with keras and pickle the output.
 ```
-python train_word_tokenizer.py data/train_products.csv $max_num_words_per_sentence $model_name  
+python train_word_tokenizer.py data/train_products.csv $max_num_words_per_sentence $word_tokenizer_model_name  
 python train_char_tokenizer.py data/train_products.csv $max_num_chars_per_word $model_name $max_number_of_words_per_sentence
 
 ```

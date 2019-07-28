@@ -76,12 +76,12 @@ class CNNLSTMCRFNetwork(object):
         labels = pad_sequences(labels, maxlen=tokenizer.max_sequence_length)
         return labels
 
-    def compile(self, wordTokenizer,charTokenizer, glove_dir='./data/', embedding_dim=300, dropout_fraction=0.2, hidden_dim=32, embedding_file='glove-sbwc.i25.vec'):
+    def compile(self, wordTokenizer,charTokenizer, data_dir='./data/', embedding_dim=300, dropout_fraction=0.2, hidden_dim=32, embedding_file='glove-sbwc.i25.vec'):
 
         # Load embedding layer
         print('Loading GloVe embedding...')
         embeddings_index = {}
-        f = open(os.path.join(glove_dir, embedding_file), 'r')
+        f = open(os.path.join(data_dir, embedding_file), 'r')
         for line in f:
             values = line.split()
             word = values[0]
@@ -118,7 +118,7 @@ class CNNLSTMCRFNetwork(object):
         charEmbeddings = TimeDistributed(Embedding(len(charTokenizer.tokenizer.word_index) + 1, output_dim=10,
                            input_length=charTokenizer.max_sequence_length))(inputCharEmbeddings)
 
-        dropout= Dropout(0.5)(charEmbeddings)
+        dropout= Dropout(dropout_fraction)(charEmbeddings)
 
         conv1d_out= TimeDistributed(Conv1D(kernel_size=3, filters=10, padding='same',activation='tanh', strides=1))(dropout)
 
@@ -126,7 +126,7 @@ class CNNLSTMCRFNetwork(object):
 
         char = TimeDistributed(Flatten())(maxpool_out)
 
-        char = Dropout(0.5)(char)
+        char = Dropout(dropout_fraction)(char)
 
         print('Concat models')
 
