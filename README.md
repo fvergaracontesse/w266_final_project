@@ -22,6 +22,7 @@ python parseProductsFile.py data/ecommerce_products.csv
 
 ```
 3. Split the file into train and test (train will include validation)
+
 ```
 python splitTrainTestProductFile.py
 
