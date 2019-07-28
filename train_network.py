@@ -46,31 +46,32 @@ def main(argv):
 
     #network params
     data_dir                                   = './data/'
-    embedding_dim                              = sys.argv[7]
+    embedding_dim                              = int(sys.argv[7])
     dropout_fraction                           = 0.2
     hidden_dim                                 = 32
     embedding_file                             = sys.argv[8]
-
+    epochs                                     = int(sys.argv[9])
+    
 
     # Get labels from NER
     if modelo == "LSTM":
         network = LSTMNetwork()
-        labels = network.get_labels(tags)
+        labels = network.get_labels(tags,wordTokenizer)
         # Compile NER network and train
         network.compile(wordTokenizer,data_dir,embedding_dim,dropout_fraction,hidden_dim,embedding_file)
-        network.train(data, labels, epochs=2)
+        network.train(data, labels, epochs=epochs)
     elif modelo == "LSTMCRF":
         network = LSTMCRFNetwork()
-        labels = network.get_labels(tags)
+        labels = network.get_labels(tags,wordTokenizer)
         # Compile NER network and train
         network.compile(wordTokenizer,data_dir,embedding_dim,dropout_fraction,hidden_dim,embedding_file)
-        network.train(data, labels, epochs=2)
+        network.train(data, labels, epochs=epochs)
     elif modelo == "CNNLSTMCRF":
         network = CNNLSTMCRFNetwork()
-        labels = network.get_labels(tags)
+        labels = network.get_labels(tags,wordTokenizer)
         # Compile NER network and train
-        network.compile(tokenizer,charTokenizer,data_dir,embedding_dim,dropout_fraction,hidden_dim,embedding_file)
-        network.train([data,charData], labels, epochs=2)
+        network.compile(wordTokenizer,charTokenizer,data_dir,embedding_dim,dropout_fraction,hidden_dim,embedding_file)
+        network.train([data,charData], labels, epochs=epochs)
     elif modelo == "BASELINE":
         baseline = Baseline()
         baseline.create(brands)
