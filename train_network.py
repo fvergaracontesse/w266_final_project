@@ -36,9 +36,11 @@ def main(argv):
     prefix_word                              =sys.argv[5]
     prefix_char                              =sys.argv[6]
 
+
     wordTokenizer = WordTokenizer(max_sequence_length_word,prefix_word)
     wordTokenizer.load()
     data = wordTokenizer.tokenize(texts)
+    print(len(texts),len(data))
 
     charTokenizer = CharTokenizer(max_sequence_length_char,prefix_char,max_sequence_length_word)
     charTokenizer.load()
@@ -47,7 +49,7 @@ def main(argv):
     #network params
     data_dir                                   = './data/'
     embedding_dim                              = int(sys.argv[7])
-    dropout_fraction                           = 0.2
+    dropout_fraction                           = 0.5
     hidden_dim                                 = 32
     embedding_file                             = sys.argv[8]
     epochs                                     = int(sys.argv[9])

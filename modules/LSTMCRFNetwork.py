@@ -51,13 +51,14 @@ class LSTMCRFNetwork(object):
             for j in range(first_word, prediction.shape[1]):
                 word_tag_probs = {}
                 for tag in self.tag_map:
-                    word_tag_probs[tag] = prediction[i,j,self.tag_map[tag]]
+                    word_tag_probs[tag] = prediction[i,j,self.tag_map[tag]-1]
                 sentence_tag_probs.append(word_tag_probs)
             all_tag_probs.append(sentence_tag_probs)
         return all_tag_probs
 
     def index_tags(self, tags):
         indices = []
+        self.tag_map = json.load(open(self.prefix+'.json', 'r'))
         for tag in tags:
             if not (tag in self.tag_map):
                 self.tag_map[tag] = len(self.tag_map) + 1
@@ -69,7 +70,7 @@ class LSTMCRFNetwork(object):
         print('Getting labels...')
         for tag_set in tag_sets:
             indexed_tags = self.index_tags(tag_set)
-            labels.append(to_categorical(np.asarray(indexed_tags), num_classes=4))
+            labels.append(to_categorical(np.asarray(indexed_tags), num_classes=4)[:,1:])
         labels = pad_sequences(labels, maxlen=tokenizer.max_sequence_length)
         return labels
 
@@ -110,7 +111,7 @@ class LSTMCRFNetwork(object):
         self.model.add(Activation('relu'))
 
         #CRF
-        crf = CRF(len(self.tag_map)+1)
+        crf = CRF(len(self.tag_map))
 
         self.model.add(crf)
 
@@ -151,8 +152,8 @@ class LSTMCRFNetwork(object):
         predictions = self.model.predict(x_test, batch_size=batch_size, verbose=1)
         predicted_classes = np.argmax(predictions, axis=2).flatten()
         y_val = np.argmax(y_test, axis=2).flatten()
-        target_names = ['']*(max(self.tag_map.values())+1)
+        target_names = ['']*(max(self.tag_map.values()))
         for category in self.tag_map:
-            target_names[self.tag_map[category]] = category
+            target_names[self.tag_map[category]-1] = category
 
         print((classification_report(y_val, predicted_classes, target_names=target_names, digits = 6, labels=range(len(target_names)))))

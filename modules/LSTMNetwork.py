@@ -43,26 +43,32 @@ class LSTMNetwork(object):
             for j in range(first_word, prediction.shape[1]):
                 word_tag_probs = {}
                 for tag in self.tag_map:
-                    word_tag_probs[tag] = prediction[i,j,self.tag_map[tag]]
+                    word_tag_probs[tag] = prediction[i,j,self.tag_map[tag]-1]
                 sentence_tag_probs.append(word_tag_probs)
             all_tag_probs.append(sentence_tag_probs)
         return all_tag_probs
 
     def index_tags(self, tags):
         indices = []
-        for tag in tags:
+        self.tag_map = json.load(open(self.prefix+'.json', 'r'))
+        #print(tags,"tags",self.tag_map)
+        for tag in tags: 
             if not (tag in self.tag_map):
+                #print(tag,self.tag_map,"entre")
                 self.tag_map[tag] = len(self.tag_map) + 1
             indices.append(self.tag_map[tag])
         return indices
 
     def get_labels(self, tag_sets, tokenizer):
         labels = []
-        print('Getting labels...')
+        #print(len(tag_sets),tokenizer.max_sequence_length)
+        print('Getting labels...') 
         for tag_set in tag_sets:
             indexed_tags = self.index_tags(tag_set)
-            labels.append(to_categorical(np.asarray(indexed_tags), num_classes=4))
+            labels.append(to_categorical(np.asarray(indexed_tags), num_classes=4)[:,1:])
+            #print(tag_set, indexed_tags, labels)
         labels = pad_sequences(labels, maxlen=tokenizer.max_sequence_length)
+        #print(labels)
         return labels
 
     def compile(self, tokenizer, data_dir='./data/', embedding_dim=300, dropout_fraction=0.2, hidden_dim=32, embedding_file='glove-sbwc.i25.vec'):
@@ -96,12 +102,14 @@ class LSTMNetwork(object):
                                  input_length=tokenizer.max_sequence_length,
                                  trainable=False,
                                  mask_zero=True))
-        self.model.Dropout(dropout_fraction)
+        self.model.add(Dropout(dropout_fraction))
         self.model.add(Bidirectional(LSTM(hidden_dim, return_sequences=True)))
         #self.model.add(TimeDistributed(Dense(hidden_dim)))
         #self.model.add(Activation('relu'))
-        self.model.add(TimeDistributed(Dense(len(self.tag_map) + 1)))
+        self.model.add(TimeDistributed(Dense(len(self.tag_map))))
         self.model.add(Activation('softmax'))
+
+        print(self.tag_map)
 
         # Compile model
         print('Compiling network...')
@@ -139,8 +147,8 @@ class LSTMNetwork(object):
         predictions_last_epoch = self.model.predict(x_test, batch_size=batch_size, verbose=1)
         predicted_classes = np.argmax(predictions_last_epoch, axis=2).flatten()
         y_val = np.argmax(y_test, axis=2).flatten()
-        target_names = ['']*(max(self.tag_map.values())+1)
+        print(y_val)
+        target_names = ['']*(max(self.tag_map.values()))
         for category in self.tag_map:
-            target_names[self.tag_map[category]] = category
-
+            target_names[self.tag_map[category]-1] = category
         print((classification_report(y_val, predicted_classes, target_names=target_names, digits = 6, labels=range(len(target_names)))))
