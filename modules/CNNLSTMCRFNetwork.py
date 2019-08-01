@@ -61,7 +61,7 @@ class CNNLSTMCRFNetwork(object):
 
     def index_tags(self, tags):
         indices = []
-        self.tag_map = json.load(open(self.prefix+'.json', 'r'))
+#        self.tag_map = json.load(open(self.prefix+'.json', 'r'))
         for tag in tags:
             if not (tag in self.tag_map):
                 self.tag_map[tag] = len(self.tag_map) + 1
@@ -77,7 +77,7 @@ class CNNLSTMCRFNetwork(object):
         labels = pad_sequences(labels, maxlen=tokenizer.max_sequence_length)
         return labels
 
-    def compile(self, wordTokenizer,charTokenizer, data_dir='./data/', embedding_dim=300, dropout_fraction=0.2, hidden_dim=32, embedding_file='glove-sbwc.i25.vec'):
+    def compile(self, wordTokenizer,charTokenizer, data_dir='./data/', embedding_dim=300, dropout_fraction=0.5, hidden_dim=32, embedding_file='glove-sbwc.i25.vec'):
 
         # Load embedding layer
         print('Loading GloVe embedding...')

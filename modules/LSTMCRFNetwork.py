@@ -58,7 +58,7 @@ class LSTMCRFNetwork(object):
 
     def index_tags(self, tags):
         indices = []
-        self.tag_map = json.load(open(self.prefix+'.json', 'r'))
+#        self.tag_map = json.load(open(self.prefix+'.json', 'r'))
         for tag in tags:
             if not (tag in self.tag_map):
                 self.tag_map[tag] = len(self.tag_map) + 1

@@ -50,7 +50,7 @@ class LSTMNetwork(object):
 
     def index_tags(self, tags):
         indices = []
-        self.tag_map = json.load(open(self.prefix+'.json', 'r'))
+        #self.tag_map = json.load(open(self.prefix+'.json', 'r'))
         #print(tags,"tags",self.tag_map)
         for tag in tags: 
             if not (tag in self.tag_map):
@@ -71,7 +71,7 @@ class LSTMNetwork(object):
         #print(labels)
         return labels
 
-    def compile(self, tokenizer, data_dir='./data/', embedding_dim=300, dropout_fraction=0.2, hidden_dim=32, embedding_file='glove-sbwc.i25.vec'):
+    def compile(self, tokenizer, data_dir='./data/', embedding_dim=300, dropout_fraction=0.5, hidden_dim=32, embedding_file='glove-sbwc.i25.vec'):
         # Load embedding layer
         print('Loading spanish embedding...')
         embeddings_index = {}
@@ -104,8 +104,8 @@ class LSTMNetwork(object):
                                  mask_zero=True))
         self.model.add(Dropout(dropout_fraction))
         self.model.add(Bidirectional(LSTM(hidden_dim, return_sequences=True)))
-        #self.model.add(TimeDistributed(Dense(hidden_dim)))
-        #self.model.add(Activation('relu'))
+        self.model.add(TimeDistributed(Dense(hidden_dim)))
+        self.model.add(Activation('relu'))
         self.model.add(TimeDistributed(Dense(len(self.tag_map))))
         self.model.add(Activation('softmax'))
 
@@ -117,7 +117,7 @@ class LSTMNetwork(object):
                            optimizer='adam',
                            metrics=['acc'])
 
-    def train(self, data, labels, validation_split=0.2, batch_size=256, epochs=3):
+    def train(self, data, labels, validation_split=0.2, batch_size=256, epochs=8):
         print('Training...')
         # Split the data into a training set and a validation set
         np.random.seed(seed=1)

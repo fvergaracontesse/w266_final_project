@@ -23,6 +23,8 @@ from tensorflow.keras.backend import sparse_categorical_crossentropy
 from tensorflow.keras.layers import Dense, TimeDistributed
 
 from sklearn.model_selection import train_test_split
+from tensorflow.python.client import device_lib
+print(device_lib.list_local_devices())
 
 from datetime import datetime
 
@@ -230,7 +232,7 @@ numNerClasses = nerDistribution.tag.nunique()
 
 k_start = 0
 #k_end = -1
-k_end = 1000
+k_end = 5000
 
 if k_end == -1:
     k_end_train = X_train[0].shape[0]

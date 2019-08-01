@@ -31,7 +31,7 @@ def processCNN(row, tokenizer,charTokenizer, network):
     # Extract entities
     data = [tokenizer.tokenize([row['title']]),charTokenizer.tokenize([row['title']])]
     #print(row['title'])
-    print(data[1])
+    #print(data[1])
     tags = network.tag(data)[0]
     #print(tags)
     brand, brand_started = '', False
