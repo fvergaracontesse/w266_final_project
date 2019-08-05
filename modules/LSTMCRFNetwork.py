@@ -144,7 +144,7 @@ class LSTMCRFNetwork(object):
         self.model.fit(x_train, y_train, validation_data=(x_val, y_val),
                        callbacks=[checkpointer],
                        epochs=epochs, batch_size=batch_size)
-        self.evaluate(x_val, y_val, batch_size)
+        #self.evaluate(x_val, y_val, batch_size)
 
     def evaluate(self, x_test, y_test, batch_size=256):
 

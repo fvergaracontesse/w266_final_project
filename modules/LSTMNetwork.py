@@ -61,7 +61,6 @@ class LSTMNetwork(object):
 
     def get_labels(self, tag_sets, tokenizer):
         labels = []
-        #print(len(tag_sets),tokenizer.max_sequence_length)
         print('Getting labels...') 
         for tag_set in tag_sets:
             indexed_tags = self.index_tags(tag_set)
@@ -140,7 +139,7 @@ class LSTMNetwork(object):
         self.model.fit(x_train, y_train, validation_data=(x_val, y_val),
                        callbacks=[checkpointer],
                        epochs=epochs, batch_size=batch_size)
-        self.evaluate(x_val, y_val, batch_size)
+        #self.evaluate(x_val, y_val, batch_size)
 
     def evaluate(self, x_test, y_test, batch_size=256):
         print('Evaluating...')

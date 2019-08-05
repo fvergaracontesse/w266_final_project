@@ -24,20 +24,55 @@ def tag_brands(brand,title):
     tagging = ''
     brand = brand.split(' ')
     brand_started = False
+    not_pass = False
+    i = 0
+    added_i = 0
+    words = title.split(' ')
     for word in title.split(' '):
-        if word == brand[0]:
+        if word == brand[0] and not_pass is False:
             tagging += 'B-B '
             brand_started = True
         elif len(brand) > 1 and brand_started:
+            j = i
             for b in brand[1:]:
-                if word == b:
+                #print(b,words[j],words,brand)
+                if words[j] == b:
                     tagging += 'I-B '
+                    added_i = added_i + 1
                 else:
                     brand_started = False
                     tagging += 'O '
+                    added_i = added_i + 1
+                    
+                j = j + 1
+            brand_started = False
+            not_pass = True
         else:
             brand_started = False
-            tagging += 'O '
+            if added_i >= 2:
+                added_i = added_i - 1
+            else:
+                tagging += 'O '
+                
+        i = i + 1
+        
+    #tagging = ''
+    #brand = brand.split(' ')
+    #brand_started = False
+    #for word in title.split(' '):
+    #    if word == brand[0]:
+    #        tagging += 'B-B '
+    #        brand_started = True
+    #    elif len(brand) > 1 and brand_started:
+    #        for b in brand[1:]:
+    #            if word == b:
+    #                tagging += 'I-B '
+    #            else:
+    #                brand_started = False
+    #                tagging += 'O '
+    #    else:
+    #        brand_started = False
+    #        tagging += 'O '
     return tagging
 
 
