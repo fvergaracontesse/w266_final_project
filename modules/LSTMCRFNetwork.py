@@ -1,7 +1,7 @@
 import os, json
 import numpy as np
 from keras.callbacks import ModelCheckpoint
-from keras.layers import Dense, Embedding, LSTM, Bidirectional, TimeDistributed, Activation
+from keras.layers import Dense, Embedding, LSTM, Bidirectional, TimeDistributed, Activation, Dropout
 from keras.models import load_model, Sequential
 from keras.utils import to_categorical
 from keras.preprocessing.sequence import pad_sequences
@@ -10,6 +10,8 @@ from keras_contrib.losses import crf_loss
 from keras_contrib.metrics import crf_accuracy
 from keras_contrib.metrics import crf_marginal_accuracy
 from keras_contrib.metrics import crf_viterbi_accuracy
+from keras.layers.advanced_activations import LeakyReLU
+from keras import regularizers
 
 from sklearn.metrics import classification_report
 
@@ -29,8 +31,8 @@ class LSTMCRFNetwork(object):
         if prefix != None: self.prefix = prefix
         self.model = load_model(self.prefix+'.h5',
                custom_objects={'CRF': CRF,
-                               'crf_loss': crf_loss,
-                               'crf_viterbi_accuracy': crf_viterbi_accuracy})
+                        'crf_loss': crf_loss,
+                        'crf_viterbi_accuracy': crf_viterbi_accuracy})
         self.tag_map = json.load(open(self.prefix+'.json', 'r'))
 
     def save(self, prefix=None):
@@ -74,7 +76,7 @@ class LSTMCRFNetwork(object):
         labels = pad_sequences(labels, maxlen=tokenizer.max_sequence_length)
         return labels
 
-    def compile(self, tokenizer, data_dir='./data/', embedding_dim=300, dropout_fraction=0.2, hidden_dim=32, embedding_file='glove-sbwc.i25.vec'):
+    def compile(self, tokenizer, data_dir='./data/', embedding_dim=300, dropout_fraction=0.2, hidden_dim=64, embedding_file='glove-sbwc.i25.vec'):
 
         # Load embedding layer
         print('Loading spanish embedding...')
@@ -107,11 +109,11 @@ class LSTMCRFNetwork(object):
                                  trainable=False,
                                  mask_zero=True))
         self.model.add(Bidirectional(LSTM(hidden_dim, return_sequences=True)))
-        self.model.add(TimeDistributed(Dense(hidden_dim)))
-        self.model.add(Activation('relu'))
+        #self.model.add(TimeDistributed(Dense(hidden_dim)))
+        self.model.add(TimeDistributed(Dense(hidden_dim, activation='relu')))
 
         #CRF
-        crf = CRF(len(self.tag_map))
+        crf = CRF(len(self.tag_map),learn_mode='marginal')
 
         self.model.add(crf)
 
@@ -120,6 +122,8 @@ class LSTMCRFNetwork(object):
         self.model.compile(loss=crf.loss_function,
                            optimizer='adam',
                            metrics=[crf.accuracy])
+        
+        self.model.summary()
 
 
     def train(self, data, labels, validation_split=0.2, batch_size=256, epochs=3):
@@ -156,4 +160,4 @@ class LSTMCRFNetwork(object):
         for category in self.tag_map:
             target_names[self.tag_map[category]-1] = category
 
-        print((classification_report(y_val, predicted_classes, target_names=target_names, digits = 6, labels=range(len(target_names)))))
+        print((classification_report(y_val, predicted_classes, target_names=target_names, digits = 2, labels=range(len(target_names)))))

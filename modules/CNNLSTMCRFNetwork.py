@@ -32,7 +32,8 @@ class CNNLSTMCRFNetwork(object):
         self.model = load_model(self.prefix+'.h5',
                custom_objects={'CRF': CRF,
                                'crf_loss': crf_loss,
-                               'crf_viterbi_accuracy': crf_viterbi_accuracy})
+                               'crf_viterbi_accuracy': crf_viterbi_accuracy,
+                               'crf_marginal_accuracy':crf_marginal_accuracy})
         self.tag_map = json.load(open(self.prefix+'.json', 'r'))
 
     def save(self, prefix=None):
@@ -140,7 +141,7 @@ class CNNLSTMCRFNetwork(object):
 
         print('Add crf layer')
 
-        crf = CRF(len(self.tag_map))
+        crf = CRF(len(self.tag_map),learn_mode='marginal')
 
         output = crf(output)
 
@@ -192,4 +193,4 @@ class CNNLSTMCRFNetwork(object):
         for category in self.tag_map:
             target_names[self.tag_map[category]-1] = category
 
-        print((classification_report(y_val, predicted_classes, target_names=target_names, digits = 6, labels=range(len(target_names)))))
+        print((classification_report(y_val, predicted_classes, target_names=target_names, digits = 3, labels=range(len(target_names)))))

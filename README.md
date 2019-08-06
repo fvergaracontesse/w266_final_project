@@ -1,8 +1,12 @@
-# Name entity recognition
+# Name entity recognition - Brand Extraction
 
 ## Introduction
 
 For an ecommerce site, recognize brand names from titles using different algorithms. From basic ones such as comparing with list of brands to more complex ones such as bidirectional lstms with CRF.
+
+For tokenization and simple LSTM brand extraction models, ProductNER (https://github.com/etano/productner) was use as a baseline, but modified for the actual dataset, added CRF layer, and created CNN for char tokenization. 
+
+For BERT model, W266 bert material was used as a baseline. It was modified for a different dataset and added a LSTM hidden layer to create a new model.
 
 ## Instructions
 
@@ -78,3 +82,14 @@ python extract_entities.py $model_dir $data_file CNNLSTMCRF $max_sequence_length
 python extract_entities.py models data/test_products.csv CNNLSTMCRF 30 10 models/word_tokenizer models/char_tokenizer
 
 ```
+
+8. Train models.
+
+To train the models jupyter notebook are added to the repository, where anyone can play with the adjustment parameters.
+
+- Basemodel.ipynb
+- bertNER.ipynb
+- bertBLSTMCRFNER.ipynb
+- CNNLSTMCRFNER.ipynb
+- LSTMCRFNER.ipynb
+- LSTMNER.ipynb
